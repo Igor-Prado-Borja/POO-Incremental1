@@ -1,6 +1,18 @@
 import java.util.Date;
 import java.util.ArrayList;
 
+enum Status{
+	DISPONIVEL("disponivel"), 
+	ALUGADO("alugado"), 
+	BLOQUEADO("bloqueado"), 
+	AUSENTE("ausente");
+
+	private String status;
+	Status(String status){
+		this.status = status;
+	}
+}
+
 class Agenda{
 	private ArrayList<Date> disponivel;
 	private ArrayList<Date> alugado;
@@ -24,23 +36,23 @@ class Agenda{
 		return this.bloqueado;
 	}
 
-	public String findDate(Date d){
+	public Status findDate(Date d){
 		for (int i = 0; i < this.getDisponivel().size(); i++){
 			if (this.getDisponivel().get(i).equals(d)){
-				return "disponivel";
+				return Status.DISPONIVEL;
 			}
 		}
 		for (int i = 0; i < this.getAlugado().size(); i++){
 			if (this.getAlugado().get(i).equals(d)){
-				return "alugado";
+				return Status.ALUGADO;
 			}
 		}
 		for (int i = 0; i < this.getBloqueado().size(); i++){
 			if (this.getBloqueado().get(i).equals(d)){
-				return "bloqueado";
+				return Status.BLOQUEADO;
 			}
 		}
-		return "ausente";
+		return Status.AUSENTE;
 	}
 
 	public void addDate(Date d, String state){
@@ -60,16 +72,16 @@ class Agenda{
 
 	public void setState(Date d, String new_state){
 		// ensure date already exists
-		String state = this.findDate(d);
-		if (state.equals("ausente")){
+		Status state = this.findDate(d);
+		if (state == Status.AUSENTE){
 			throw new RuntimeException("Tentativa de modificar data não existente");	
 		}	
 		// remove date 
-		if (state.equals("disponivel")){
+		if (state == Status.DISPONIVEL){
 			this.getDisponivel().remove(d);
-		} else if (state.equals("alugado")){
+		} else if (state == Status.ALUGADO){
 			this.getAlugado().remove(d);
-		} else if (state.equals("bloqueado")){
+		} else if (state == Status.BLOQUEADO){
 			this.getBloqueado().remove(d);
 		}
 

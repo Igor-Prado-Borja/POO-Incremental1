@@ -56,7 +56,7 @@ class Agenda{
 	}
 
 	public void addDate(Date d, String state){
-		if (!this.findDate(d).equals("ausente")){
+		if (this.findDate(d) != Status.AUSENTE){
 			throw new RuntimeException("Tentativa de adicionar data já registrada");
 		}
 		if (state.equals("disponivel")){

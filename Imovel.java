@@ -3,12 +3,14 @@ public class Imovel {
     private Endereco endereco;
     private String tipo;
     private String uso;
+    private Agenda agenda;
 
     public Imovel(Long numeroIPTU, String rua, Long numero, String cep, String estado, String cidade, String tipo, String uso) {
         this.numeroIPTU = numeroIPTU;
         this.endereco = new Endereco(rua, numero, cep, estado, cidade);
         this.tipo = tipo;
         this.uso = uso;
+        this.agenda = new Agenda();
     }
 
     /**

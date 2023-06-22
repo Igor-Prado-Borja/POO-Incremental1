@@ -53,7 +53,7 @@ class Endereco{
             this.estado = estado;
             this.cidade = cidade;
         } else {
-            throw new IllegalArgumentException("Estado inválido: deve ser informada a sigla (em maiúsculas) de um estado brasileiro existente."); // TODO FIXME write custom exception
+            throw new IllegalArgumentException("Estado inválido: deve ser informada a sigla (em maiúsculas) de um estado brasileiro existente."); // TODO write custom exception
         }
     }
 

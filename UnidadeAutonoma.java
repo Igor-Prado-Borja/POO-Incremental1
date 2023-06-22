@@ -54,4 +54,11 @@ class UnidadeAutonoma extends Imovel{
             throw new IllegalArgumentException("Sazonalidade inválida.");
         }
     }
+
+    public String toString(){
+        String base_s = super.toString();
+        base_s += "Área útil: " + Double.toString(this.getAreaUtil()) + "\n";
+        base_s += "Área construída: " + Double.toString(this.getAreaConstruida()) + "\n";
+        return base_s;
+    }
 }

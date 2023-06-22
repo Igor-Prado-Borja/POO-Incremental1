@@ -27,7 +27,13 @@ class App{
         System.out.print("[");
         for (int i = 0; i < this.getImoveis().size(); i++){
             System.out.println();
-            String content = this.getImoveis().get(i).toString();
+            Imovel im = this.getImoveis().get(i);
+            String content = this.getImoveis().get(i).toString(); // base case (Imovel)
+            if (im instanceof UnidadeAutonoma){
+                content = ((UnidadeAutonoma)this.getImoveis().get(i)).toString();
+            } else if (im instanceof UnidadeCompartilhada){
+                content = ((UnidadeCompartilhada)this.getImoveis().get(i)).toString();
+            }
             Scanner input = new Scanner(content).useDelimiter("\n");
             // print which line with a tab
             while (input.hasNext()){

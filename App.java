@@ -39,6 +39,7 @@ class App{
             while (input.hasNext()){
                 System.out.println("    " + input.next());
             }
+            input.close(); // avoid resource leak
         }
         System.out.println("]");
     }
@@ -53,6 +54,7 @@ class App{
             while (input.hasNext()){
                 System.out.println("    " + input.next());
             }
+            input.close(); // avoid resource leak
         }
         System.out.println("]");
     }
@@ -70,7 +72,8 @@ class App{
             System.out.println("6 - Sair");
             System.out.println("-------------------------");
             action = actionInput.nextInt();
-            
+            actionInput.nextLine(); // NOTE flush newline after reading int
+
             if (action == 1){
                 Imovel imovel = this.readImovel(actionInput);
                 this.getImoveis().add(imovel);

@@ -90,7 +90,8 @@ public abstract class Imovel {
     }
 
     public String toString() {
-        String s = "Tipo: " + this.getTipo() + "\n";
+        String s = "Número IPTU: " + Long.toString(this.getNumeroIPTU()) + "\n";
+        s += "Tipo: " + this.getTipo() + "\n";
         s += "Uso: " + this.getUso() + "\n"; 
         s += this.endereco.toString();
         return s;

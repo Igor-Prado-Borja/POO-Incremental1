@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.StringReader;
-
 
 class App{
     private ArrayList<Imovel> imoveis;
     private ArrayList<Proprietario> proprietarios;
+    private InputStream source;
 
-    App(){
+    App(InputStream source){
+        this.source = source;
         this.imoveis = new ArrayList<Imovel>();
         this.proprietarios = new ArrayList<Proprietario>();
     }
@@ -51,23 +53,23 @@ class App{
 
     public void run(){
         int action;
-        Scanner actionInput = new Scanner(System.in);
+        Scanner actionInput = new Scanner(this.source);
         while (true){
             System.out.println("Digite a ação desejada: ");
             System.out.println("1 - Cadastrar imóvel");
             System.out.println("2 - Cadastrar proprietário");
             System.out.println("3 - Listar imóveis");
             System.out.println("4 - Listar proprietários");
-            System.out.println("5 - Calcular aluguel de um dado imóvel"); // TODO IMPLEMENT
+            System.out.println("5 - Calcular aluguel de um dado imóvel");
             System.out.println("6 - Sair");
             System.out.println("-------------------------");
             action = actionInput.nextInt();
             
             if (action == 1){
-                Imovel imovel = this.readImovel();
+                Imovel imovel = this.readImovel(actionInput);
                 this.getImoveis().add(imovel);
             } else if (action == 2){
-                Proprietario propr = this.readProprietario();
+                Proprietario propr = this.readProprietario(actionInput);
                 this.getProprietarios().add(propr);
             } else if (action == 3){
                 System.out.println("Imóveis cadastrados:");
@@ -76,21 +78,23 @@ class App{
                 System.out.println("Proprietários cadastrados:");
                 this.prettyPrintProprietarios();
             } else if (action == 5){
-                this.displayAluguel();
+                this.displayAluguel(actionInput);
             }
             else if (action == 6){
+                System.out.println("Saindo...");
                 break;
             } else {
                 System.out.println("Ação inválida.");
             }
         }
+        actionInput.close(); // avoid resource leaks
     }
 
-    public Endereco readEndereco(){
+    public Endereco readEndereco(Scanner input){
         String rua, cep, estado, cidade;
         Long numero;
 
-        Scanner input = new Scanner(System.in);
+        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o nome da rua: ");
         rua = input.nextLine();
         System.out.println("Digite o número do imóvel: ");
@@ -107,16 +111,16 @@ class App{
         return new Endereco(rua, numero, cep, estado, cidade);
     }
 
-    public Imovel readImovel(){
+    public Imovel readImovel(Scanner input){
         Long numeroIPTU;
         String tipo, uso;
         Endereco endereco;
 
-        Scanner input = new Scanner(System.in);
+        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o número do IPTU do imóvel: ");
         numeroIPTU = input.nextLong();
         // nextLong() does not consume the newline character, so we need to do it manually
-        input.nextLine();        
+        // input.nextLine();
 
         System.out.println("Digite o valor do IPTU (anual) do imóvel: ");
         double valorIPTU = input.nextDouble();
@@ -124,7 +128,7 @@ class App{
         input.nextLine();
 
         System.out.println("Entre com as informações de endereço do imóvel abaixo:");
-        endereco = this.readEndereco(); 
+        endereco = this.readEndereco(input);
         
         System.out.println("Digite o tipo do imóvel: ");
         tipo = input.nextLine();
@@ -153,7 +157,7 @@ class App{
             System.out.println("Digite as áreas de lazer da residência, separadas por vírgula:");
             String[] areasLazer = input.nextLine().split(",");
             System.out.println("Entre com as informações de endereço do condomínio abaixo:");
-            enderecoCondominio = this.readEndereco();
+            enderecoCondominio = this.readEndereco(input);
             UnidadeCompartilhada imovel = new UnidadeCompartilhada(numeroIPTU, endereco, tipo, uso, valorIPTU, idCondominio, enderecoCondominio);
             for (String area: areasLazer){
                 imovel.addAreaLazer(area);
@@ -161,14 +165,14 @@ class App{
             return imovel;
         } else {
             throw new IllegalArgumentException("Classe de imóvel inválida.");
-        }        
+        }
     }
 
-    public Proprietario readProprietario(){
+    public Proprietario readProprietario(Scanner input){
         String nome, cpf, rg;
         Endereco endereco;
 
-        Scanner input = new Scanner(System.in);
+        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o nome do proprietário: ");   
         nome = input.nextLine();
         System.out.println("Digite o CPF do proprietário: ");
@@ -177,20 +181,20 @@ class App{
         rg = input.nextLine();
 
         System.out.println("Entre com as informações de endereço do proprietário abaixo:");
-        endereco = this.readEndereco(); 
-        
+        endereco = this.readEndereco(input);
+
         return new Proprietario(nome, cpf, rg, endereco);
     }
 
-    public void displayAluguel(){
-        Scanner input = new Scanner(System.in);
+    public void displayAluguel(Scanner input){
+        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o número do IPTU do imóvel: ");
 
         Imovel im = null;
         Long numeroIPTU = input.nextLong();
         boolean foundImovel = false;
         for (Imovel i: this.getImoveis()){
-            if (i.getNumeroIPTU() == numeroIPTU){
+            if (i.getNumeroIPTU().equals(numeroIPTU)){
                 im = i;
                 foundImovel = true;
                 break;
@@ -221,7 +225,5 @@ class App{
         } else {
             throw new IllegalArgumentException("Tipo de imóvel inválido. Saindo...");
         }
-         
-        System.out.println("Saindo...");
     }
 }

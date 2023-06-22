@@ -71,7 +71,7 @@ class UnidadeCompartilhada extends Imovel{
     public double calculaAluguel(int sazonalidade){
         if (0 <= sazonalidade && sazonalidade <= 4){
             double valorReferencia = this.getValorIPTU() * this.getAreasLazer().size(); // valor de referência = valor IPTU * número de áreas de lazer
-            double valorFinal = valorReferencia * (1 + Imovel.indicesAluguel[sazonalidade] / 100.0);
+            double valorFinal = valorReferencia * (1 + (double)Imovel.indicesAluguel[sazonalidade] / 100.0);
             if (this.getAreasLazer().size() > 0){
                 return valorFinal;
             } else {

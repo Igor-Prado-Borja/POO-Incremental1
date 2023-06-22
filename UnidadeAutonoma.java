@@ -49,7 +49,7 @@ class UnidadeAutonoma extends Imovel{
 
     public double calculaAluguel(int sazonalidade){
         if (0 <= sazonalidade && sazonalidade <= 4){
-            return this.getAreaConstruida() * UnidadeAutonoma.multiplicador * (1 + Imovel.indicesAluguel[sazonalidade] / 100.0); 
+            return this.getAreaConstruida() * UnidadeAutonoma.multiplicador * (1 + (double)Imovel.indicesAluguel[sazonalidade] / 100.0);
         } else {
             throw new IllegalArgumentException("Sazonalidade inválida.");
         }

@@ -85,7 +85,7 @@ public class Proprietario {
         if (!imovel.getEndereco().equals(this.endereco)){
             // checar se esse imóvel já foi cadastrado
             for (int i = 0; i < this.imoveis.size(); i++){
-                if (this.imoveis.get(i).getNumeroIPTU() == imovel.getNumeroIPTU()){
+                if (this.imoveis.get(i).getNumeroIPTU().equals(imovel.getNumeroIPTU())){
                     throw new RuntimeException("Imóvel já cadastrado: não pode ser cadastrado novamente.");
                 }
             }
@@ -93,23 +93,40 @@ public class Proprietario {
             this.imoveis.add(imovel);
             this.disp.add(true);
         } else {
-            throw new IllegalArgumentException("Endereço do imóvel deve ser diferente do endereço de seu proprietário."); // TODO FIXME write custom exception
+            throw new IllegalArgumentException("Endereço do imóvel deve ser diferente do endereço de seu proprietário."); // TODO write custom exception
         }
     }
 
     /**
-     * Overload: passando os atributos do imovel como argumento
+     * Overload: passando os atributos do imovel (endereço já encapsulado) como argumento, e criando {@link UnidadeAutonoma}
      * */
-    public void cadastraImovel(Long numeroIPTU, Endereco endereco, String tipo, String uso){
-        Imovel i = new Imovel(numeroIPTU, endereco, tipo, uso);
+    public void cadastraImovel(Long numeroIPTU, Endereco endereco, String tipo, String uso, double valorIPTU, double areaUtil, double areaConstruida){
+        UnidadeAutonoma i = new UnidadeAutonoma(numeroIPTU, endereco, tipo, uso, valorIPTU, areaUtil, areaConstruida);
         this.cadastraImovel(i);
     }
 
     /**
-     * Overlaod: passando os atributos do imóvel e do endereço do imóvel, todos abertos/não-encapsulados
+     * Overload: passando os atributos do imóvel e do endereço do imóvel, todos abertos/não-encapsulados, e criando {@link UnidadeAutonoma}
      * */
-    public void cadastraImovel(Long numeroIPTU, String rua, Long numero, String cep, String estado, String cidade, String tipo, String uso){
-        Imovel i = new Imovel(numeroIPTU, rua, numero, cep, estado, cidade, tipo, uso);
+    public void cadastraImovel(Long numeroIPTU, String rua, Long numero, String cep, String estado, String cidade, String tipo, String uso, double valorIPTU, double areaUtil, double areaConstruida){
+        UnidadeAutonoma i = new UnidadeAutonoma(numeroIPTU, rua, numero, cep, estado, cidade, tipo, uso, areaUtil, areaConstruida);
+        this.cadastraImovel(i);
+    }
+
+    /**
+     * Overload: passando os atributos do imovel (endereço já encapsulado) como argumento, e criando {@link UnidadeCompartilhada}
+     */
+    public void cadastraImovel(Long numeroIPTU, Endereco endereco, String tipo, String uso, double valorIPTU, String idCondominio, Endereco enderecoCondominio){
+        UnidadeCompartilhada i = new UnidadeCompartilhada(numeroIPTU, endereco, tipo, uso, valorIPTU, idCondominio, enderecoCondominio);
+        this.cadastraImovel(i);
+    }
+
+    /**
+     * Overload: passando os atributos do imóvel e do endereço do imóvel, todos abertos/não-encapsulados, e criando {@link UnidadeCompartilhada}
+     * */
+
+    public void cadastraImovel(Long numeroIPTU, String rua, Long numero, String cep, String estado, String cidade, String tipo, String uso, double valorIPTU, String idCondominio, Endereco enderecoCondominio){
+        UnidadeCompartilhada i = new UnidadeCompartilhada(numeroIPTU, rua, numero, cep, estado, cidade, tipo, uso, valorIPTU, idCondominio, enderecoCondominio);
         this.cadastraImovel(i);
     }
 
@@ -153,7 +170,20 @@ public class Proprietario {
         s += "Nome: " + this.getNome() + "\n";
         s += "CPF: " + this.getCpf() + "\n";
         s += "RG: " + this.getRg() + "\n";
-        s += this.endereco.toString();
+        s += this.endereco.toString() + "\n";
+
+        s += "Imóveis: [";
+
+        String imovel_indent = "";
+        for (int i = 0; i < 4; i++){
+            imovel_indent += " ";
+        }
+        for (int i = 0; i < this.getImoveis().size(); i++){
+            String imovel_info = this.getImoveis().get(i).toString();
+            imovel_info = imovel_info.replaceAll("\n", imovel_indent + "\n");
+            s += "\n" + imovel_info + "\n";
+        }
+        s += "]";
         return s;
     }
 }

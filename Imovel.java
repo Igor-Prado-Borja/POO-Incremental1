@@ -1,4 +1,4 @@
-public class Imovel {
+public abstract class Imovel {
     private Long numeroIPTU;
     private Endereco endereco;
     private String tipo;

@@ -94,4 +94,42 @@ class Agenda{
 			this.getBloqueado().add(d);
 		}
 	}
+
+	public boolean checkInformacaoAusente(LocalDate dataInicial, LocalDate dataFinal){
+		// Retorna se existe data com informação ausente no período
+		for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+			if (this.findLocalDate(data) == Status.AUSENTE){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public LocalDate findInformacaoAusente(LocalDate dataInicial, LocalDate dataFinal){
+		// Retorna primeira data com informação ausente no período
+		for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+			if (this.findLocalDate(data) == Status.AUSENTE){
+				return data;
+			}
+		}
+		return null;
+	}
+
+	public boolean checkDisponibilidade(LocalDate dataInicial, LocalDate dataFinal){
+		for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+            if (this.findLocalDate(data) != Status.DISPONIVEL){
+                return false;
+            }
+        }
+		return true;
+	}
+
+	public LocalDate findIndisponibilidade(LocalDate dataInicial, LocalDate dataFinal){
+		for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+			if (this.findLocalDate(data) != Status.DISPONIVEL){
+				return data;
+			}
+		}
+		return null;
+	}
 }

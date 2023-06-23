@@ -88,13 +88,13 @@ class UnidadeCompartilhada extends Imovel{
             cond_indent += " ";
         } // 4 spaces
 
-        String base_s = super.toString();
+        String base_s = super.toString() + "\n";
         base_s += "Informações do condomínio:\n";
         base_s += cond_indent + "ID do condomínio: " + this.getIdCondominio() + "\n";
         String indented_address = this.getEnderecoCondominio().toString().replaceAll("\n", cond_indent + "\n");
         base_s += cond_indent + indented_address + "\n";
         for (int i = 0; i < this.getAreasLazer().size(); i++){
-            base_s += "Área de lazer " + Integer.toString(i) + ": " + this.getAreasLazer().get(i) + "\n";
+            base_s += cond_indent + "Área de lazer " + Integer.toString(i) + ": " + this.getAreasLazer().get(i) + "\n";
         }
         return base_s;
     }

@@ -56,7 +56,7 @@ class UnidadeAutonoma extends Imovel{
     }
 
     public String toString(){
-        String base_s = super.toString();
+        String base_s = super.toString() + "\n";
         base_s += "Área útil: " + Double.toString(this.getAreaUtil()) + "\n";
         base_s += "Área construída: " + Double.toString(this.getAreaConstruida()) + "\n";
         return base_s;

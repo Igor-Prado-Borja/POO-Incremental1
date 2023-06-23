@@ -60,16 +60,11 @@ class App extends CalendarioGlobal{
     }
 
     public void prettyPrintProprietarios(){
-        System.out.print("[");
+        System.out.println("[");
         for (int i = 0; i < this.getProprietarios().size(); i++){
-            System.out.println();
             String content = this.getProprietarios().get(i).toString();
-            Scanner input = new Scanner(content).useDelimiter("\n");
-            // print which line with a tab
-            while (input.hasNext()){
-                System.out.println("    " + input.next());
-            }
-            input.close(); // avoid resource leak
+            content = "    " + content.replaceAll("\n", "\n    "); // print all lines idented by 4 spaces
+            System.out.println(content);
         }
         System.out.println("]");
     }
@@ -137,7 +132,6 @@ class App extends CalendarioGlobal{
         String rua, cep, estado, cidade;
         Long numero;
 
-        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o nome da rua: ");
         rua = input.nextLine();
         System.out.println("Digite o número do imóvel: ");
@@ -159,7 +153,6 @@ class App extends CalendarioGlobal{
         String tipo, uso;
         Endereco endereco;
 
-        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o número do IPTU do imóvel: ");
         numeroIPTU = input.nextLong();
         // nextLong() does not consume the newline character, so we need to do it manually
@@ -215,7 +208,6 @@ class App extends CalendarioGlobal{
         String nome, cpf, rg;
         Endereco endereco;
 
-        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o nome do proprietário: ");   
         nome = input.nextLine();
         System.out.println("Digite o CPF do proprietário: ");
@@ -264,7 +256,6 @@ class App extends CalendarioGlobal{
     }
 
     public void displayAluguel(Scanner input){
-        //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o número do IPTU do imóvel: ");
 
         Long numeroIPTU = input.nextLong();
@@ -316,33 +307,8 @@ class App extends CalendarioGlobal{
             return;
         }
 
-        // iterate over dataInicial to dataFinal
-        // for each day, check if it is a holiday
-        // if it is, check the sazonalidade
-        // if it is not, check the sazonalidade "Comum"
-        // sum the values
-        // print the sum
-        double valorAluguel = 0.0;
-        for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
-            if (this.getFeriados().containsKey(data)){
-                int sazonalidade = this.getFeriados().get(data);
-                if (im instanceof UnidadeAutonoma){
-                    valorAluguel += ((UnidadeAutonoma)im).calculaAluguel(sazonalidade);
-                } else if (im instanceof UnidadeCompartilhada){
-                    valorAluguel += ((UnidadeCompartilhada)im).calculaAluguel(sazonalidade);
-                } else {
-                    throw new IllegalArgumentException("Tipo de imóvel inválido. Saindo...");
-                }
-            } else {
-                if (im instanceof UnidadeAutonoma){
-                    valorAluguel += ((UnidadeAutonoma)im).calculaAluguel(0);
-                } else if (im instanceof UnidadeCompartilhada){
-                    valorAluguel += ((UnidadeCompartilhada)im).calculaAluguel(0);
-                } else {
-                    throw new IllegalArgumentException("Tipo de imóvel inválido. Saindo...");
-                }
-            }
-        }
+        double valorAluguel = im.calculaAluguelPeriodo(dataInicial, dataFinal, this.getFeriados());
+
         System.out.println("O valor do aluguel durante esse período é: " + Double.toString(valorAluguel));
     }
 
@@ -366,17 +332,16 @@ class App extends CalendarioGlobal{
             return;
         }
 
-        // itere sobre dataInicial até dataFinal
-        for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
-            if (im.getAgenda().findLocalDate(data) == Status.AUSENTE){
-                System.out.println("Imóvel com disponibilidade desconhecida na data " + data.toString());
-                return;
-            }
-            if (im.getAgenda().findLocalDate(data) != Status.DISPONIVEL){
-                System.out.println("Imóvel indisponível na data " + data.toString());
-                return;
+        if (im.getAgenda().checkDisponibilidade(dataInicial, dataFinal)){
+            System.out.println("Imóvel indisponível no período especificado.");
+            System.out.println("Primeira data indisponível:" + im.getAgenda().findIndisponibilidade(dataInicial, dataFinal).toString());
+        } else {
+            if (im.getAgenda().checkInformacaoAusente(dataInicial, dataFinal)){
+                System.out.println("Imóvel com disponibilidade desconhecida no período especificado.");
+                System.out.println("Primeira data com status desconhecido:" + im.getAgenda().findInformacaoAusente(dataInicial, dataFinal).toString());
+            } else {
+                System.out.println("Imóvel disponível no período especificado.");
             }
         }
-        System.out.println("Imóvel disponível no período especificado.");
     }
 }

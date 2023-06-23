@@ -180,7 +180,7 @@ public class Proprietario {
         }
         for (int i = 0; i < this.getImoveis().size(); i++){
             String imovel_info = this.getImoveis().get(i).toString();
-            imovel_info = imovel_info.replaceAll("\n", imovel_indent + "\n");
+            imovel_info = imovel_indent + imovel_info.replaceAll("\n", "\n" + imovel_indent);
             s += "\n" + imovel_info + "\n";
         }
         s += "]";

@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.util.Map;
+
 public abstract class Imovel {
     private Long numeroIPTU;
     private Endereco endereco;
@@ -91,6 +94,30 @@ public abstract class Imovel {
 
     public Agenda getAgenda(){
         return this.agenda;
+    }
+
+    public abstract double calculaAluguel(int sazonalidade);
+
+    public double calculaAluguelPeriodo(LocalDate dataInicial, LocalDate dataFinal, Map<LocalDate, Integer> feriados){
+        double valorAluguel = 0.0;
+        for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+            if (feriados.containsKey(data)){
+                int sazonalidade = feriados.get(data);
+                valorAluguel += this.calculaAluguel(sazonalidade);
+            } else {
+                valorAluguel += this.calculaAluguel(0);
+            }
+        }
+        return valorAluguel;
+    }
+
+    public double calculaAluguelPeriodo(LocalDate dataUnica, Map<LocalDate, Integer> feriados){
+        if (feriados.containsKey(dataUnica)){
+            int sazonalidade = feriados.get(dataUnica);
+            return this.calculaAluguel(sazonalidade);
+        } else {
+            return this.calculaAluguel(0);
+        }
     }
 
     public String toString() {

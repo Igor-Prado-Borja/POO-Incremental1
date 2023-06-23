@@ -3,8 +3,23 @@ import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.time.LocalDate;
+import java.util.HashMap;
 
-class App{
+class App extends CalendarioGlobal{
+    private static final ArrayList<String> actionNames
+        = new ArrayList<String>(Arrays.asList(
+        "Cadastrar imóvel",
+        "Cadastrar proprietário",
+        "Listar imóveis",
+        "Listar proprietários",
+        "Calcular aluguel de um dado imóvel em uma dada sazonalidade",
+        "Calcular aluguel de um dado imóvel em um dado período",
+        "Verificar disponibilidade de um dado imóvel",
+        "Sair"
+    ));
+
     private ArrayList<Imovel> imoveis;
     private ArrayList<Proprietario> proprietarios;
     private InputStream source;
@@ -59,40 +74,57 @@ class App{
         System.out.println("]");
     }
 
+    public Imovel procuraImovelNumIPTU(Long numeroIPTU){
+        for (Imovel im: this.getImoveis()){
+            if (im.getNumeroIPTU().equals(numeroIPTU)){
+                return im;
+            }
+        }
+        return null;
+    }
+
     public void run(){
         int action;
         Scanner actionInput = new Scanner(this.source);
         while (true){
             System.out.println("Digite a ação desejada: ");
-            System.out.println("1 - Cadastrar imóvel");
-            System.out.println("2 - Cadastrar proprietário");
-            System.out.println("3 - Listar imóveis");
-            System.out.println("4 - Listar proprietários");
-            System.out.println("5 - Calcular aluguel de um dado imóvel");
-            System.out.println("6 - Sair");
-            System.out.println("-------------------------");
+            for (int i = 0; i < App.actionNames.size(); i++){
+                System.out.println(Integer.toString(i + 1) + " - " + App.actionNames.get(i));
+            }
             action = actionInput.nextInt();
             actionInput.nextLine(); // NOTE flush newline after reading int
 
             if (action == 1){
+                // "Cadastrar imóvel",
                 Imovel imovel = this.readImovel(actionInput);
                 this.getImoveis().add(imovel);
             } else if (action == 2){
+                // "Cadastrar proprietário"
                 Proprietario propr = this.readProprietario(actionInput);
                 this.getProprietarios().add(propr);
             } else if (action == 3){
+                // "Listar imóveis"
                 System.out.println("Imóveis cadastrados:");
                 this.prettyPrintImoveis();
             } else if (action == 4){
+                // "Listar proprietários"
                 System.out.println("Proprietários cadastrados:");
                 this.prettyPrintProprietarios();
             } else if (action == 5){
+                // "Calcular aluguel de um dado imóvel em uma dada sazonalidade"
                 this.displayAluguel(actionInput);
-            }
-            else if (action == 6){
+            } else if (action == 6) {
+                // "Calcular aluguel de um dado imóvel em um dado período"
+                this.displayAluguelPeriodo(actionInput);
+            } else if (action == 7){
+                // "Verificar disponibilidade de um dado imóvel"
+                this.verificaDisponibilidade(actionInput);
+            } else if (action == 8){
+                // "Sair"
                 System.out.println("Saindo...");
                 break;
             } else {
+                //
                 System.out.println("Ação inválida.");
             }
         }
@@ -199,30 +231,20 @@ class App{
         //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o número do IPTU do imóvel: ");
 
-        Imovel im = null;
         Long numeroIPTU = input.nextLong();
-        boolean foundImovel = false;
-        for (Imovel i: this.getImoveis()){
-            if (i.getNumeroIPTU().equals(numeroIPTU)){
-                im = i;
-                foundImovel = true;
-                break;
-            }
-        }
-
-        if (!foundImovel){
-            throw new IllegalArgumentException("Imóvel não encontrado. Saindo...");
+        Imovel im = this.procuraImovelNumIPTU(numeroIPTU);
+        if (im == null){
+            System.out.println("Imóvel não encontrado. Saindo...");
+            return;
         }
 
         System.out.println("Digite a sazonalidade do aluguel (0-4): ");
-        System.out.println("0 - Comum");
-        System.out.println("1 - Reveillon");
-        System.out.println("2 - Carnaval");
-        System.out.println("3 - Feriado Alta Estação");
-        System.out.println("4 - Feriado Baixa Estação");
+        this.printOpcoesSazonalidades();
         int sazonalidade = input.nextInt();
-        if (sazonalidade < 0 || sazonalidade > 4){
-            throw new IllegalArgumentException("Sazonalidade inválida. Saindo...");
+
+        if (sazonalidade < 0 || sazonalidade > App.MAXSAZONALIDADES){
+            System.out.println("Sazonalidade inválida. Saindo...");
+            return;
         }
 
         if (im instanceof UnidadeAutonoma){
@@ -232,7 +254,93 @@ class App{
             System.out.println("Imóvel do tipo Unidade Compartilhada.");
             System.out.println("O valor do aluguel é: " + ((UnidadeCompartilhada)im).calculaAluguel(sazonalidade));
         } else {
-            throw new IllegalArgumentException("Tipo de imóvel inválido. Saindo...");
+            System.out.println("Tipo de imóvel inválido. Saindo...");
+            return;
         }
+    }
+
+    public void displayAluguelPeriodo(Scanner input){
+        System.out.println("Digite o número do IPTU do imóvel: ");
+        Long numeroIPTU = input.nextLong();
+
+        Imovel im = this.procuraImovelNumIPTU(numeroIPTU);
+
+        if (im == null){
+            System.out.println("Imóvel não encontrado. Saindo...");
+            return;
+        }
+
+        // ler data inicial
+        System.out.println("Entrando com a data inicial do período de aluguel:");
+        LocalDate dataInicial = this.readLocalDate(input);
+        System.out.println("Entrando com a data final do período de aluguel:");
+        LocalDate dataFinal = this.readLocalDate(input);
+        if (dataInicial == null || dataFinal == null){
+            System.out.println("Datas inválidas");
+            return;
+        }
+
+        // iterate over dataInicial to dataFinal
+        // for each day, check if it is a holiday
+        // if it is, check the sazonalidade
+        // if it is not, check the sazonalidade "Comum"
+        // sum the values
+        // print the sum
+        double valorAluguel = 0.0;
+        for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+            if (this.getFeriados().containsKey(data)){
+                int sazonalidade = this.getFeriados().get(data);
+                if (im instanceof UnidadeAutonoma){
+                    valorAluguel += ((UnidadeAutonoma)im).calculaAluguel(sazonalidade);
+                } else if (im instanceof UnidadeCompartilhada){
+                    valorAluguel += ((UnidadeCompartilhada)im).calculaAluguel(sazonalidade);
+                } else {
+                    throw new IllegalArgumentException("Tipo de imóvel inválido. Saindo...");
+                }
+            } else {
+                if (im instanceof UnidadeAutonoma){
+                    valorAluguel += ((UnidadeAutonoma)im).calculaAluguel(0);
+                } else if (im instanceof UnidadeCompartilhada){
+                    valorAluguel += ((UnidadeCompartilhada)im).calculaAluguel(0);
+                } else {
+                    throw new IllegalArgumentException("Tipo de imóvel inválido. Saindo...");
+                }
+            }
+        }
+        System.out.println("O valor do aluguel durante esse período é: " + Double.toString(valorAluguel));
+    }
+
+    public void verificaDisponibilidade(Scanner input){
+        System.out.println("Digite o número do IPTU do imóvel: ");
+        Long numeroIPTU = input.nextLong();
+
+        Imovel im = this.procuraImovelNumIPTU(numeroIPTU);
+        if (im == null){
+            System.out.println("Imóvel não encontrado. Saindo...");
+            return;
+        }
+        
+        // ler data inicial
+        System.out.println("Entrando com a data inicial do período de aluguel:");
+        LocalDate dataInicial = this.readLocalDate(input);
+        System.out.println("Entrando com a data final do período de aluguel:");
+        LocalDate dataFinal = this.readLocalDate(input);
+        if (dataInicial == null || dataFinal == null){
+            System.out.println("Datas inválidas. Saindo...");
+            return;
+        }
+
+        // itere sobre dataInicial até dataFinal
+        for (LocalDate data = dataInicial; data.isBefore(dataFinal); data = data.plusDays(1)){
+            if (im.getAgenda().findLocalDate(data) == Status.AUSENTE){
+                System.out.println("Imóvel com disponibilidade desconhecida na data " + data.toString());
+                return;
+            }
+            if (im.getAgenda().findLocalDate(data) != Status.DISPONIVEL){
+                System.out.println("Imóvel indisponível na data " + data.toString());
+                return;
+            }
+        }
+        System.out.println("Imóvel disponível no período especificado.");
     }
 }

@@ -89,6 +89,10 @@ public abstract class Imovel {
         this.valorIPTU = valorIPTU;
     }
 
+    public Agenda getAgenda(){
+        return this.agenda;
+    }
+
     public String toString() {
         String s = "Número IPTU: " + Long.toString(this.getNumeroIPTU()) + "\n";
         s += "Tipo: " + this.getTipo() + "\n";

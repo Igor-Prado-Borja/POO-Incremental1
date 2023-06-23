@@ -1,4 +1,4 @@
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 enum Status{
@@ -14,29 +14,29 @@ enum Status{
 }
 
 class Agenda{
-	private ArrayList<Date> disponivel;
-	private ArrayList<Date> alugado;
-	private ArrayList<Date> bloqueado;
+	private ArrayList<LocalDate> disponivel;
+	private ArrayList<LocalDate> alugado;
+	private ArrayList<LocalDate> bloqueado;
 
 	public Agenda(){
-		this.disponivel = new ArrayList<Date>();
-		this.alugado = new ArrayList<Date>();
-		this.bloqueado = new ArrayList<Date>();
+		this.disponivel = new ArrayList<LocalDate>();
+		this.alugado = new ArrayList<LocalDate>();
+		this.bloqueado = new ArrayList<LocalDate>();
 	}
 
-	public ArrayList<Date> getDisponivel(){
+	public ArrayList<LocalDate> getDisponivel(){
 		return this.disponivel;
 	}
 
-	public ArrayList<Date> getAlugado(){
+	public ArrayList<LocalDate> getAlugado(){
 		return this.alugado;
 	}
 
-	public ArrayList<Date> getBloqueado(){
+	public ArrayList<LocalDate> getBloqueado(){
 		return this.bloqueado;
 	}
 
-	public Status findDate(Date d){
+	public Status findLocalDate(LocalDate d){
 		for (int i = 0; i < this.getDisponivel().size(); i++){
 			if (this.getDisponivel().get(i).equals(d)){
 				return Status.DISPONIVEL;
@@ -55,8 +55,8 @@ class Agenda{
 		return Status.AUSENTE;
 	}
 
-	public void addDate(Date d, String state){
-		if (this.findDate(d) != Status.AUSENTE){
+	public void addLocalDate(LocalDate d, String state){
+		if (this.findLocalDate(d) != Status.AUSENTE){
 			throw new RuntimeException("Tentativa de adicionar data já registrada");
 		}
 		if (state.equals("disponivel")){
@@ -70,13 +70,13 @@ class Agenda{
 		}
 	}
 
-	public void setState(Date d, String new_state){
-		// ensure date already exists
-		Status state = this.findDate(d);
+	public void setState(LocalDate d, String new_state){
+		// ensure LocalDate already exists
+		Status state = this.findLocalDate(d);
 		if (state == Status.AUSENTE){
 			throw new RuntimeException("Tentativa de modificar data não existente");	
 		}	
-		// remove date 
+		// remove LocalDate 
 		if (state == Status.DISPONIVEL){
 			this.getDisponivel().remove(d);
 		} else if (state == Status.ALUGADO){
@@ -85,7 +85,7 @@ class Agenda{
 			this.getBloqueado().remove(d);
 		}
 
-		// add date again with updated state
+		// add LocalDate again with upLocalDated state
 		if (new_state.equals("disponivel")){
 			this.getDisponivel().add(d);	
 		} else if (new_state.equals("alugado")){

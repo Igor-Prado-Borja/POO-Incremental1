@@ -87,10 +87,12 @@ class App extends CalendarioGlobal{
         int action;
         Scanner actionInput = new Scanner(this.source);
         while (true){
+            System.out.println("-----------------------------------");
             System.out.println("Digite a ação desejada: ");
             for (int i = 0; i < App.actionNames.size(); i++){
                 System.out.println(Integer.toString(i + 1) + " - " + App.actionNames.get(i));
             }
+            System.out.println("-----------------------------------");
             action = actionInput.nextInt();
             actionInput.nextLine(); // NOTE flush newline after reading int
 
@@ -224,7 +226,41 @@ class App extends CalendarioGlobal{
         System.out.println("Entre com as informações de endereço do proprietário abaixo:");
         endereco = this.readEndereco(input);
 
-        return new Proprietario(nome, cpf, rg, endereco);
+        Proprietario p = new Proprietario(nome, cpf, rg, endereco);
+
+        while (true){
+            System.out.println("Ações:");
+            System.out.println("1 - Adicionar imóvel");
+            System.out.println("2 - Sair");
+            int action = input.nextInt();
+            if (action == 1){
+                Imovel im = null;
+                System.out.println("Deseja vincular proprietário a Imóvel já existente? [Y/n]");
+                String answer = input.next();
+                input.nextLine(); // flush newline
+                if (answer.equals("y")){
+                    System.out.println("Digite o número do IPTU do imóvel: ");
+                    Long numeroIPTU = input.nextLong();
+                    im = this.procuraImovelNumIPTU(numeroIPTU);
+                    if (im == null){
+                        System.out.println("Imóvel não encontrado. Saindo...");
+                        break; // early return from while loop
+                    } 
+                } else if (answer.equals("n")){
+                    im = this.readImovel(input);
+                    if (im == null){
+                        System.out.println("Imóvel inválido, dexando de cadastrar.");
+                        break; // early return from while loop
+                    } 
+                }
+                p.cadastraImovel(im);
+            } else if (action == 2){
+                break;
+            } else {
+                System.out.println("Ação inválida.");
+            }            
+        }
+        return p;
     }
 
     public void displayAluguel(Scanner input){

@@ -78,8 +78,14 @@ class App{
                 Imovel imovel = this.readImovel(actionInput);
                 this.getImoveis().add(imovel);
             } else if (action == 2){
-                Proprietario propr = this.readProprietario(actionInput);
-                this.getProprietarios().add(propr);
+                try{
+                    Proprietario propr = this.readProprietario(actionInput);
+                    this.getProprietarios().add(propr);
+                } catch (UsuarioExistenteException e){
+                    System.out.println("Cancelando ação...");
+                    System.out.println("-------------------------");
+                    continue; // skip action
+                }
             } else if (action == 3){
                 System.out.println("Imóveis cadastrados:");
                 this.prettyPrintImoveis();
@@ -177,17 +183,31 @@ class App{
         }
     }
 
-    public Proprietario readProprietario(Scanner input){
+    public Proprietario readProprietario(Scanner input) throws UsuarioExistenteException{
         String nome, cpf, rg;
         Endereco endereco;
 
         //Scanner input = new Scanner(this.source); //FIXME REMOVE MULTIPLE SCANNER DECL
         System.out.println("Digite o nome do proprietário: ");   
         nome = input.nextLine();
-        System.out.println("Digite o CPF do proprietário: ");
+        System.out.println("Digite o CPF do proprietário (apenas dígitos): ");
         cpf = input.nextLine();
-        System.out.println("Digite o RG do proprietário: ");
+        System.out.println("Digite o RG do proprietário (apenas dígitos): ");
         rg = input.nextLine();
+
+        // check for same cpf
+        for (Proprietario p : this.getProprietarios()){
+            if (p.getCpf().equals(cpf)){
+                throw UsuarioExistenteException("Tentativa de adicionar proprietário existente.");
+            }
+        }
+        // check for same rg
+        for (Proprietario p : this.getProprietarios()){
+            if (p.getRg().equals(rg)){
+                throw UsuarioExistenteException("Tentativa de adicionar proprietário existente.");
+            }
+        }
+        // ok
 
         System.out.println("Entre com as informações de endereço do proprietário abaixo:");
         endereco = this.readEndereco(input);

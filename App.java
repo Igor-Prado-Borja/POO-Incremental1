@@ -82,6 +82,7 @@ class App{
                     Proprietario propr = this.readProprietario(actionInput);
                     this.getProprietarios().add(propr);
                 } catch (UsuarioExistenteException e){
+                    System.out.println(String.format("Erro: %s", e.getMessage()));
                     System.out.println("Cancelando ação...");
                     System.out.println("-------------------------");
                     continue; // skip action
@@ -192,19 +193,19 @@ class App{
         nome = input.nextLine();
         System.out.println("Digite o CPF do proprietário (apenas dígitos): ");
         cpf = input.nextLine();
-        System.out.println("Digite o RG do proprietário (apenas dígitos): ");
-        rg = input.nextLine();
-
         // check for same cpf
         for (Proprietario p : this.getProprietarios()){
             if (p.getCpf().equals(cpf)){
-                throw UsuarioExistenteException("Tentativa de adicionar proprietário existente.");
+                throw new UsuarioExistenteException("Tentativa de adicionar proprietário existente.");
             }
         }
+
+        System.out.println("Digite o RG do proprietário (apenas dígitos): ");
+        rg = input.nextLine();
         // check for same rg
         for (Proprietario p : this.getProprietarios()){
             if (p.getRg().equals(rg)){
-                throw UsuarioExistenteException("Tentativa de adicionar proprietário existente.");
+                throw new UsuarioExistenteException("Tentativa de adicionar proprietário existente.");
             }
         }
         // ok
